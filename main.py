@@ -1,16 +1,27 @@
-# This is a sample Python script.
+import tomllib
+from typing import Any
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from disnake import Intents
+from disnake.ext.commands import Bot
 
+from lib import get_prefix
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def main(config: dict[str, Any]) -> None:
 
+    bot = Bot(
+        command_prefix = get_prefix(config["default_prefix"]),
+        case_insensitive = True,
+        #help_command = None,
+        strip_after_prefix = True,
+        intents = Intents.all(), # Must change this when specifics about the bot are known.
+    )
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+    bot.load_extensions("extensions")
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    bot.run(config["api_key"])
+
+if __name__ == "__main__":
+    with open("config.toml", "rb") as config_file:
+        configuration = tomllib.load(config_file)
+
+    main(configuration)

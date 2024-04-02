@@ -1,5 +1,5 @@
 from disnake import Message
-from disnake.ext.commands import Cog, Bot, Context, command, dm_only
+from disnake.ext.commands import Cog, Bot, Context
 
 __all__ = ()
 
@@ -11,6 +11,14 @@ class Listener(Cog):
         self.bot: Bot = bot
 
     @Cog.listener("on_message")
-    @dm_only()
     async def listener(self, message: Message) -> None:
-        ...
+
+        # Filter messages to only relevant ones.
+        if message.author.bot or message.guild or (await self.bot.get_context(message)).command: return
+
+        json_package = {
+            "id": message.author.id,
+            "text:": message.content
+        }
+
+        # TODO: Send json package to the server with LLM.

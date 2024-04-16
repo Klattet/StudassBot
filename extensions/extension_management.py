@@ -14,6 +14,10 @@ class ExtensionManagement(Cog):
 
     @staticmethod
     async def is_team_member(ctx: Context) -> bool:
+        """
+        Check if the user calling the command is a dev team member.
+        """
+
         app_info: AppInfo = await ctx.bot.application_info()
         is_member: bool = ctx.author in app_info.team.members
 
@@ -22,7 +26,7 @@ class ExtensionManagement(Cog):
 
         return is_member
 
-    async def load_extension(self, extension_name: str, reply_message: Message) -> Message:
+    async def load_extension(self, extension_name: str, reply_message: Message) -> None:
         message_content: str = reply_message.content
 
         print(f"Loading extension: {extension_name}")
@@ -31,17 +35,17 @@ class ExtensionManagement(Cog):
         try:
             self.bot.load_extension(f"extensions.{extension_name}")
             print(f"Loaded extension: {extension_name}")
-            return await reply_message.edit(f"{message_content}\nLoaded: {extension_name}")
+            await reply_message.edit(f"{message_content}\nLoaded: {extension_name}")
         except ExtensionAlreadyLoaded:
             print(f"Failed to load extension. Extension already loaded: {extension_name}")
-            return await reply_message.edit(f"{message_content}\nAlready loaded: {extension_name}")
+            await reply_message.edit(f"{message_content}\nAlready loaded: {extension_name}")
         except ExtensionNotFound:
             print(f"Failed to load extension. Name not found: {extension_name}")
-            return await reply_message.edit(f"{message_content}\nNo such extension: {extension_name}")
+            await reply_message.edit(f"{message_content}\nNo such extension: {extension_name}")
         except (NoEntryPointError, ExtensionFailed) as exception:
             print(f"Failed to load extension. Code failed to execute: {extension_name}")
             print(exception, file = sys.stderr, flush = True)
-            return await reply_message.edit(f"{message_content}\nCode error: {extension_name}")
+            await reply_message.edit(f"{message_content}\nCode error: {extension_name}")
 
     @group(name = "load", invoke_without_command = True)
     @check(is_team_member)
@@ -70,17 +74,17 @@ class ExtensionManagement(Cog):
         try:
             self.bot.reload_extension(f"extensions.{extension_name}")
             print(f"Reloaded extension: {extension_name}")
-            return await reply_message.edit(f"{message_content}\nReloaded: {extension_name}")
+            await reply_message.edit(f"{message_content}\nReloaded: {extension_name}")
         except ExtensionNotLoaded:
             print(f"Failed to reload extension. Extension not loaded: {extension_name}")
-            return await reply_message.edit(f"{message_content}\nNot loaded: {extension_name}")
+            await reply_message.edit(f"{message_content}\nNot loaded: {extension_name}")
         except ExtensionNotFound:
             print(f"Failed to reload extension. Name not found: {extension_name}")
-            return await reply_message.edit(f"{message_content}\nNo such extension: {extension_name}")
+            await reply_message.edit(f"{message_content}\nNo such extension: {extension_name}")
         except (NoEntryPointError, ExtensionFailed) as exception:
             print(f"Failed to reload extension. Code failed to execute: {extension_name}")
             print(exception, file = sys.stderr, flush = True)
-            return await reply_message.edit(f"{message_content}\nCode error: {extension_name}")
+            await reply_message.edit(f"{message_content}\nCode error: {extension_name}")
 
     @group(name = "reload", invoke_without_command = True)
     @check(is_team_member)
@@ -110,17 +114,17 @@ class ExtensionManagement(Cog):
         try:
             self.bot.unload_extension(f"extensions.{extension_name}")
             print(f"Unloaded extension: {extension_name}")
-            return await reply_message.edit(f"{message_content}\nUnloaded: {extension_name}")
+            await reply_message.edit(f"{message_content}\nUnloaded: {extension_name}")
         except ExtensionNotLoaded:
             print(f"Failed to unload extension. Extension not loaded: {extension_name}")
-            return await reply_message.edit(f"{message_content}\nNot loaded: {extension_name}")
+            await reply_message.edit(f"{message_content}\nNot loaded: {extension_name}")
         except ExtensionNotFound:
             print(f"Failed to unload extension. Name not found: {extension_name}")
-            return await reply_message.edit(f"{message_content}\nNo such extension: {extension_name}")
+            await reply_message.edit(f"{message_content}\nNo such extension: {extension_name}")
         except (NoEntryPointError, ExtensionFailed) as exception:
             print(f"Failed to unload extension. Code failed to execute: {extension_name}")
             print(exception, file = sys.stderr, flush = True)
-            return await reply_message.edit(f"{message_content}\nCode error: {extension_name}")
+            await reply_message.edit(f"{message_content}\nCode error: {extension_name}")
 
     @group(name = "unload", invoke_without_command = True)
     @check(is_team_member)

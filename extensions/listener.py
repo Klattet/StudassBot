@@ -1,22 +1,23 @@
-import tomllib
+import tomllib, json, asyncio, re
 from socket import socket, AF_INET, SOCK_STREAM
-from typing import Any
-from json import loads, JSONDecodeError
+from typing import Any, TypeAlias, Union
+from traceback import format_exc
 
 from disnake import Message
 from disnake.ext.commands import Cog, Bot, Context
-from jsonschema import validate, ValidationError
+from jsonschema import validate
 
 __all__ = ()
 
-type Schema = dict[str, str | Schema]
+Schema: TypeAlias = dict[str, Union[str, "Schema"]]
 
 schema: Schema = {
     "type": "object",
     "properties": {
         "id": {"type": "number"},
         "text": {"type": "string"}
-    }
+    },
+    "additionalProperties": False
 }
 
 def setup(bot: Bot) -> None:
@@ -26,48 +27,45 @@ class Listener(Cog):
     def __init__(self, bot: Bot) -> None:
         self.bot: Bot = bot
 
+        self.socket: socket | None = None
+        self.is_connecting: bool = False
+
         with open("config.toml", "rb") as config_file:
             config = tomllib.load(config_file)
 
-        self.socket = self.establish_connection(config["server_ip"], config["port"])
+        self.server_ip: str = config["server_ip"]
+        self.port: int = config["port"]
+        self.bytes_limit: int = config["bytes_limit"]
 
-    @staticmethod
-    def establish_connection(host: str, port: int) -> socket:
-        sock: socket = socket(AF_INET, SOCK_STREAM)
-        sock.connect((host, port))
-        return sock
+        self.translator: dict[int, str] = str.maketrans({"\"": "\\\""})
 
-    def prompt_send_receive(self, user_id: int, prompt: str) -> str:
+    @Cog.listener("on_ready")
+    async def connect(self) -> None:
         """
-        Send prompt to server and expect a reply from LLM.
-        Return the reply string.
+        Establish a connection to the LLM server.
         """
 
-        try:
-            self.socket.send(f'{{"id": {user_id}, "text": "{prompt}"}}'.encode(encoding = "utf-8"))
+        self.is_connecting = True
 
-            received_data: bytes = self.socket.recv(4096)
+        while True:
+            try:
+                self.socket = socket(AF_INET, SOCK_STREAM)
 
-            data: Any = loads(received_data)
-            validate(data, schema)
+                print(f"Attempting to connect to LLM server at {self.server_ip}:{self.port}")
+                self.socket.connect((self.server_ip, self.port))
+                self.is_connecting = False
+                print("Connected successfully.")
+                return
 
-            return data["text"]
+            except Exception as e:
+                print("Encountered exception while trying to connect to LLM server.")
+                print(format_exc())
+                print("Retrying in 15 seconds.")
+                await asyncio.sleep(15)
 
-        except UnicodeDecodeError:
-            print("Data received was not correctly unicode encoded.")
-            return "Something went wrong."
-
-        except JSONDecodeError:
-            print("Data received was not correctly json encoded.")
-            return "Something went wrong."
-
-        except ValidationError:
-            print("Data received did not match the json schema.")
-            return "Something went wrong."
-
-        except TimeoutError:
-            print("Server did not respond.")
-            return "Something went wrong."
+    @property
+    def is_connected(self) -> bool:
+        return self.socket is not None and self.socket.fileno() != -1
 
     @Cog.listener("on_message")
     async def listener(self, message: Message) -> None:
@@ -79,4 +77,44 @@ class Listener(Cog):
         context: Context = await self.bot.get_context(message)
         if message.author.bot or message.guild or context.command: return
 
-        await message.channel.send(self.prompt_send_receive(message.author.id, message.content))
+        print("Received a prompt.")
+
+        temporary_message: Message = await message.channel.send("Please wait while reply is being generated.")
+
+        try:
+
+            assert self.is_connected and not self.is_connecting
+
+            print("Sending prompt to LLM server.")
+
+            reply_bytes: bytes = message.content.encode(encoding = "utf-8")
+
+            assert len(reply_bytes) <= self.bytes_limit
+
+            self.socket.sendall(reply_bytes)
+
+            print("Waiting on reply.")
+            received_data: bytes = self.socket.recv(self.bytes_limit)
+
+            assert received_data != b""
+
+            reply_message: str = received_data.decode(encoding = "utf-8")
+
+            n_messages: int = len(reply_message) // 2000 + 1
+            n_character_per: int = len(reply_message) // n_messages
+
+            for i in range(n_messages):
+                await message.channel.send(reply_message[i:i+n_character_per])
+
+            print("Finished processing a prompt.")
+
+        except Exception as e:
+            print("Encountered an error while listening for prompts.")
+            print(format_exc())
+            await message.channel.send("Something went wrong.")
+
+            if not self.is_connected and not self.is_connecting:
+                print("Attempting to reconnect.")
+                await self.connect()
+
+        await temporary_message.delete()

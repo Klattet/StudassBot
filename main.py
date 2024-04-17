@@ -17,9 +17,9 @@ def main() -> None:
         strip_after_prefix = True,
         intents = Intents.all(), # Must change this when specifics about the bot are known.
     )
-
     bot.load_extensions("extensions")
 
+    print("Starting.")
     bot.run(config["api_key"])
 
 if __name__ == "__main__":

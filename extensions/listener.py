@@ -70,6 +70,8 @@ class Listener(Cog):
             _, temporary = self.waiting_list.pop(message.author.id)
             await temporary.delete()
             await message.reply("Something went wrong.", mention_author = False)
+            print("Error encountered.")
+            print(format_exc())
 
     async def send(self) -> None:
 
@@ -82,9 +84,21 @@ class Listener(Cog):
             original, temporary = self.waiting_list.pop(package["id"])
 
             await temporary.delete()
+            
+            if len(package["text"].strip()) == 0:
+                print("Empty response received.") 
+                await original.channel.send("I'm sorry, I could not find a response to that.")
+            
+            elif len(package["text"]) <= 2000:
+                print("Short response received.")
+                await original.channel.send(package["text"])
+            
+            else:
+                print("Long response received.")
+                n_messages: int = len(package["text"]) // 2000 + 1
+                n_character_per: int = len(package["text"]) // n_messages
 
-            n_messages: int = len(package["text"]) // 2000 + 1
-            n_character_per: int = len(package["text"]) // n_messages
-
-            for i in range(n_messages):
-                await original.channel.send(package["text"][i * n_character_per:i * n_character_per + n_character_per])
+                for i in range(n_messages):
+                    msg = package["text"][i * n_character_per:i * n_character_per + n_character_per]
+                    if len(msg) != 0:
+                        await original.channel.send(msg)

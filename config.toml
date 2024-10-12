@@ -1,0 +1,6 @@
+default_prefix = "?"
+api_key = "you thought"
+
+server_ip = "CHANGE ME"
+port = "CHANGE ME"
+bytes_limit = 65535

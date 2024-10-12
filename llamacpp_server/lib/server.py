@@ -2,7 +2,7 @@ import json, websockets, asyncio
 from typing import Any
 from traceback import format_exc
 
-from lib.models import LLM
+from ..lib import LLM
 
 __all__ = "init_server",
 

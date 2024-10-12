@@ -1,8 +1,7 @@
 # Config containing sensitive data.
-config.toml
-server/haystack_server/data/
 
-
+# TODO: Remember to censor the config.toml if you have a secret token in there.
+haystack_server/data/
 
 
 

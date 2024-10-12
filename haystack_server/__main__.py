@@ -1,8 +1,8 @@
 from haystack.document_stores.in_memory import InMemoryDocumentStore
 from haystack.dataclasses import Document
 
-from server.parsing import parse_directory
-from lib import LLamaCpp, LLMResult
+from parsing import parse_directory
+from haystack_server.lib import LLamaCpp, LLMResult
 
 prompt_template = """\
 You are a student assistant. You must answer in a way that helps students arrive at the correct answer themselves.

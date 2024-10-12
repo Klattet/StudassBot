@@ -1,8 +1,8 @@
 import traceback, sys, gc, json
 from typing import Generator, Any
 
-from lib import LLM
-from server.haystack_server.testing import LLMTester
+from ..lib import LLM
+from llamacpp_server.testing import LLMTester
 
 __all__ = "test_model_dump", "test_models_dump", "parse_tps", "print_sorted_tps", "parse_responses", "print_responses"
 

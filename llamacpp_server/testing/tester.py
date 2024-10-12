@@ -1,7 +1,7 @@
 import dataclasses, os, json
 from typing import Any
 
-from lib import LLM, StaticResult, StreamResult
+from ..lib import LLM, StaticResult, StreamResult
 
 __all__ = "LLMTester",
 

@@ -2,7 +2,7 @@ import asyncio
 
 from llamacpp_server.lib import LLM, init_server
 
-llm_path = "/home/bruker/Downloads/orca-2-7b.Q4_K_M.gguf"
+llm_path = "CHANGE ME"
 
 def main() -> None:
 

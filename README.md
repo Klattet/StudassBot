@@ -21,7 +21,7 @@ The prototype was voluntarily alpha-tested by over 30 Programming-2 students at 
 | [pdfminer.six](https://github.com/pdfminer/pdfminer.six) | Parsing text out of PDF files                  |
 | [python-docx](https://github.com/python-openxml/python-docx) | Parsing text out of docx files                 |
 | [websockets](https://github.com/python-websockets/websockets) | Handling socket requests asynchronously        |
-<br><b/>
+
 After cloning this repo, I recommend creating a virtual environment with:
 ```commandline
 python -m venv .venv

@@ -12,19 +12,30 @@ Multiple open source language models that were popular at the time were tested f
 The prototype was voluntarily alpha-tested by over 30 Programming-2 students at the campus, to varying degrees of success. We found that the quality of the LLM responses was highly dependent on the quality of the user's prompt. A common trend was that users initiated the conversation with a few or even a single word, leading to the generation of a poor or blank response. This meant that the effectiveness of the chatbot assistant was highly dependent on the user's prompting efficacy.
 
 ## Dependencies
-- [disnake](https://github.com/DisnakeDev/disnake)
-- [haystack-ai](https://github.com/deepset-ai/haystack)
-- [jsonschema](https://github.com/python-jsonschema/jsonschema)
-- [llama-cpp-haystack](https://github.com/deepset-ai/haystack-core-integrations/tree/main/integrations/llama_cpp)
-- [pdfminer.six](https://github.com/pdfminer/pdfminer.six)
-- [python-docx](https://github.com/python-openxml/python-docx)
-- [websockets](https://github.com/python-websockets/websockets)
-
+| Library | Usecase                                        |
+|---|------------------------------------------------|
+| [disnake](https://github.com/DisnakeDev/disnake) | Controlling the bot user through Discord's API |
+| [haystack-ai](https://github.com/deepset-ai/haystack) | Tools for creating a LLM prompt pipeline       |
+| [jsonschema](https://github.com/python-jsonschema/jsonschema) | Ensuring valid JSON format                     |
+| [llama-cpp-haystack](https://github.com/deepset-ai/haystack-core-integrations/tree/main/integrations/llama_cpp) | LlamaCPP integration with Haystack.            |
+| [pdfminer.six](https://github.com/pdfminer/pdfminer.six) | Parsing text out of PDF files                  |
+| [python-docx](https://github.com/python-openxml/python-docx) | Parsing text out of docx files                 |
+| [websockets](https://github.com/python-websockets/websockets) | Handling socket requests asynchronously        |
+<br><b/>
+After cloning this repo, I recommend creating a virtual environment with:
+```commandline
+python -m venv .venv
 ```
+Then activating it with:
+```commandline
+source .venv/bin/activate
+```
+<br><b/>
+Run either of the commands below to install dependencies.
+```commandline
 pip install disnake haystack-ai jsonschema llama-cpp-haystack pdfminer.six python-docx websockets
 ```
-or
-```
+```commandline
 pip install -r requirements.txt
 ```
 

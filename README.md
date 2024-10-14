@@ -22,6 +22,7 @@ The prototype was voluntarily alpha-tested by over 30 Programming-2 students at 
 | [python-docx](https://github.com/python-openxml/python-docx) | Parsing text out of docx files                 |
 | [websockets](https://github.com/python-websockets/websockets) | Handling socket requests asynchronously        |
 
+
 After cloning this repo, I recommend creating a virtual environment with:
 ```commandline
 python -m venv .venv
@@ -30,7 +31,7 @@ Then activating it with:
 ```commandline
 source .venv/bin/activate
 ```
-<br><b/>
+
 Run either of the commands below to install dependencies.
 ```commandline
 pip install disnake haystack-ai jsonschema llama-cpp-haystack pdfminer.six python-docx websockets
